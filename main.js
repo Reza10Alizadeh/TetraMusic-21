@@ -1,1 +1,44 @@
-const playPauseBtn=document.querySelector(".play-pause"),songProgress=document.querySelector(".song-progress"),songTime=document.querySelector(".song-time");let wavesurfer,lastUpdateTime=0;function playPauseSong(){wavesurfer.isPlaying()?(wavesurfer.pause(),playPauseBtn.innerHTML='<i class="fas fa-play"></i>'):(wavesurfer.play(),playPauseBtn.innerHTML='<i class="fas fa-pause"></i>')}window.addEventListener("load",()=>{(wavesurfer=WaveSurfer.create({container:"#waveform",waveColor:"#ddd",progressColor:"#a1a6a5",url:"music/Shahram Shabpareh - Mossafer (online-audio-converter.com).mp3",borderWidth:4,responsive:!0,height:60,barRadius:4})).on("audioprocess",()=>{let e=wavesurfer.getCurrentTime();e-lastUpdateTime>.1&&(songProgress.value=e,updateSongTime(),lastUpdateTime=e)}),songProgress.addEventListener("input",()=>{wavesurfer.seekTo(songProgress.value/songProgress.max)})}),playPauseBtn.addEventListener("click",playPauseSong);const darkModeToggle=document.getElementById("dark-mode-toggle");"enabled"===localStorage.getItem("darkMode")&&document.body.classList.add("dark-mode"),darkModeToggle.addEventListener("click",()=>{document.body.classList.contains("dark-mode")?(document.body.classList.remove("dark-mode"),localStorage.setItem("darkMode","disabled")):(document.body.classList.add("dark-mode"),localStorage.setItem("darkMode","enabled"))}),window.addEventListener("load",function(){document.body.classList.add("loaded")});
+const playPauseBtn = document.querySelector(".play-pause");
+const audio = document.querySelector(".audio");
+const progressBar = document.querySelector("#progress");
+const preloader = document.getElementById("preloader");
+
+playPauseBtn.addEventListener("click", () => {
+  if (audio.paused) {
+    audio.play();
+    playPauseBtn.innerHTML = '<i class="fa-solid fa-pause"></i>';
+  } else {
+    audio.pause();
+    playPauseBtn.innerHTML = '<i class="fa-solid fa-play"></i>';
+  }
+});
+
+audio.addEventListener("timeupdate", () => {
+  const progress = (audio.currentTime / audio.duration) * 100;
+  progressBar.value = progress;
+});
+
+progressBar.addEventListener("input", () => {
+  const progress = (progressBar.value * audio.duration) / 100;
+  audio.currentTime = progress;
+});
+const darkModeToggle = document.getElementById("dark-mode-toggle");
+const body = document.body;
+
+if (localStorage.getItem("darkMode") === "enabled") {
+  body.classList.add("dark-mode");
+} else {
+  body.classList.remove("dark-mode");
+}
+darkModeToggle.addEventListener("click", () => {
+  if (body.classList.contains("dark-mode")) {
+    body.classList.remove("dark-mode");
+    localStorage.setItem("darkMode", "disabled");
+  } else {
+    body.classList.add("dark-mode");
+    localStorage.setItem("darkMode", "enabled");
+  }
+});
+window.addEventListener("load", () => {
+  preloader.style.display = "none"; 
+});
